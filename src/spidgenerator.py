@@ -71,19 +71,20 @@ SP_Prefix = "SP"
 SP_Delimeter = "-"
 SP_Max_Digits = 12
 
-def Only_Digits(String):
-    sis = re.sub(r"\D", "", String)
-    return sis
-
-def Create_Set_Of_ID_Numbers(Numbers):
-    Len_Of_Numbers = len(Numbers)
-    Len_Of_Numbers_As_String = str(Len_Of_Numbers)
-    Zeros = "0"*(SP_Max_Digits - Len_Of_Numbers)
-    if Len_Of_Numbers < 10:
-        Len_Of_Numbers_As_String = "0" + Len_Of_Numbers_As_String
-    return "".join([Len_Of_Numbers_As_String, Numbers, Zeros]) 
-
 def Generate_ID(Original_ID, Source="CVE"):
+    
+    def Only_Digits(String):
+        sis = re.sub(r"\D", "", String)
+        return sis
+
+    def Create_Set_Of_ID_Numbers(Numbers):
+        Len_Of_Numbers = len(Numbers)
+        Len_Of_Numbers_As_String = str(Len_Of_Numbers)
+        Zeros = "0"*(SP_Max_Digits - Len_Of_Numbers)
+        if Len_Of_Numbers < 10:
+            Len_Of_Numbers_As_String = "0" + Len_Of_Numbers_As_String
+        return "".join([Len_Of_Numbers_As_String, Numbers, Zeros]) 
+        
     Current_Year = str(datetime.now().year)
     try:
         Src = Our_Sources[Source.lower()]
