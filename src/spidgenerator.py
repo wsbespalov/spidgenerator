@@ -251,7 +251,8 @@ class SPID(peewee.Model):
         return dict(
             id=self.id,
             spid=self.spid,
-            sync=dt2str(self.sync)
+            sync=self.sync
+            #sync=dt2str(self.sync)
         )
 
 def Check_If_SPID_Is_Unique(ID):
@@ -310,18 +311,21 @@ def Test_If_ID_Is_Unique():
     if not database.is_closed():
         database.close()
 
-print('Test_If_ID_Is_Unique:')
-Test_If_ID_Is_Unique()
-print('Test complete')
+# print('Test_If_ID_Is_Unique:')
+# Test_If_ID_Is_Unique()
+# print('Test complete')
 
 ################################################################################
 # Methods and testing
 ################################################################################
 
 ### Duplicates from ws-vm-cve-search stats.py
+import os
 from sqlalchemy import create_engine, exists, Column, DateTime, Integer, String, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 metadata = MetaData()
 engine = create_engine('sqlite:///' + os.path.join(basedir, 'stats.db'), echo=False)
@@ -331,16 +335,102 @@ Session = sessionmaker()
 Session.configure(bind=engine)
 session = Session()
 
-class SPID(Base):
-    pass
+class SSPID(Base):
+    __tablename__ = "spid"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    spid = Column(String, default="", unique=True)
+    sync = Column(DateTime, default=datetime.utcnow())
+
+    def __repr__(self):
+        return "({}, {}, {})".format(self.id, self.spid, self.sync)
+
+    def __str__(self):
+        return self.spid
+
+    @property
+    def to_json(self):
+        return dict(
+            id=self.id,
+            spid=self.spid,
+            sync=self.sync
+        )
 
 
 Base.metadata.create_all(engine)
 
 
+def If_SPID_Already_Exists_It_SQLite(spid):
+        if not session.query(exists().where(SSPID.spid == spid)).scalar():
+            session.close()
+            return False
+        session.close()
+        return True
+
+def Create_SPID_In_SQLite(spid, sync=None):
+    sid = -1
+    if sync is None:
+        sync = datetime.utcnow()
+    if not If_SPID_Already_Exists_It_SQLite(spid):
+        obj = SSPID()
+        obj.spid = spid
+        obj.sync = sync
+        session.add(obj)
+        session.commit()
+        sid = obj.id
+        session.close()
+    return sid
+
+def Count_SPID_In_SQLIte():
+    return session.query(SSPID.id).count()
+
+def Count_SPID_In_Postgres():
+    if SPID.table_exists():
+        return SPID.select().count()
+    return -1
+
+def Recovery_From_SQLite():
+    try:
+        spids = session.query(SSPID).all()
+    except Exception as ex:
+        print("Get an exception with reading SPIDs from SQLite: {}".format(ex))
+        spids = []
+    data = []
+    for s in spids:
+        data.append(s.to_json)
+    return data
+
+def Recovery_From_Postgres():
+    try:
+        spids = list(SPID.select())
+    except Exception as ex:
+        print("Get an exception with reading SPIDs from Postgres: {}".format(ex))
+        spids = []
+    data = []
+    for s in spids:
+        data.append(s.to_json)
+    return data
+
 def Sync_SPID_Tables():
-    pass
+    SQLite_Data = Recovery_From_SQLite()
+    Postgres_Data = Recovery_From_Postgres()
+
+    print('Sync Postgres -> SQLite')
+    for PD in Postgres_Data:
+        print('Get   {}'.format(PD))
+        if not If_SPID_Already_Exists_It_SQLite(PD["spid"]):
+            Create_SPID_In_SQLite(spid=PD["spid"], sync=PD["sync"])
+            print("Push  {} -> SQLite".format(PD))
+    
+    print('Sync SQLite -> Postgres')
+    for SD in SQLite_Data:
+        print('Get   {}'.format(SD))
+        if Check_If_SPID_Is_Unique(ID=SD["spid"]):
+            Append_SPID_Into_Postgres_Database(SPIdentifier=SD["spid"], Sync_Datetime=SD["sync"])
+            print("Push  {} -> Postgres".format(SD))
 
 
 def Test_Sync_IDs_Tables():
-    pass
+    Sync_SPID_Tables()
+
+Test_Sync_IDs_Tables()
