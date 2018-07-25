@@ -40,13 +40,21 @@ Our_Sources = {
     "user": "U"
 }
 
-Years = {
-    "2002": "02", "2003": "03", "2004": "04", "2005": "05",
-    "2006": "06", "2007": "07", "2008": "08", "2009": "09",
-    "2010": "10", "2011": "11", "2012": "12", "2013": "13",
-    "2014": "14", "2015": "15", "2016": "16", "2017": "17",
-    "2018": "18", "2019": "19", "2020": "20", "2021": "21"
-}
+def Years(Current_Year):
+    y = str(Current_Year)
+    if len(y) == 4:
+        return y[2:]
+    else:
+        y = str(datetime.utcnow().year)
+        return y[2:]
+
+# Years = {
+#     "2002": "02", "2003": "03", "2004": "04", "2005": "05",
+#     "2006": "06", "2007": "07", "2008": "08", "2009": "09",
+#     "2010": "10", "2011": "11", "2012": "12", "2013": "13",
+#     "2014": "14", "2015": "15", "2016": "16", "2017": "17",
+#     "2018": "18", "2019": "19", "2020": "20", "2021": "21"
+# }
 
 # from scan_db import scan_database_for_snyk_ids
 # from scan_db import connect_database
@@ -71,6 +79,7 @@ SP_Prefix = "SP"
 SP_Delimeter = "-"
 SP_Max_Digits = 12
 
+
 def Generate_ID(Original_ID, Source="CVE"):
     
     def Only_Digits(String):
@@ -94,7 +103,7 @@ def Generate_ID(Original_ID, Source="CVE"):
     if Src == "C":
         OI_As_List = Original_ID.split("-")
         if len(OI_As_List) == 3:
-            CVE_Year = Years[OI_As_List[1]]
+            CVE_Year = Years(OI_As_List[1])
             CVE_Numbers = OI_As_List[2]
             CVE_Short_Year_And_Numbers = CVE_Year + CVE_Numbers
             Set_Of_CVE_Numbers = Create_Set_Of_ID_Numbers(CVE_Short_Year_And_Numbers)
@@ -103,14 +112,14 @@ def Generate_ID(Original_ID, Source="CVE"):
         else:
             return ""
     elif Src == "N":
-        NPM_Year = Years[Current_Year]
+        NPM_Year = Years(Current_Year)
         NPM_Numbers = Only_Digits(Original_ID)
         NPM_Short_Year_And_Numbers = NPM_Year + NPM_Numbers
         Set_Of_NPM_Numbers = Create_Set_Of_ID_Numbers(NPM_Short_Year_And_Numbers)
         Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_NPM_Numbers])
         return Our_ID
     elif Src == "S":
-        SNYK_Year = Years[Current_Year]
+        SNYK_Year = Years(Current_Year)
         if Original_ID.startswith("npm:"):
             Original_ID_Splitted = Original_ID.split(":")
             if len(Original_ID_Splitted) > 2:
@@ -134,7 +143,7 @@ def Generate_ID(Original_ID, Source="CVE"):
                     return Our_ID
                 return ""
     elif Src == "U":
-        User_Year = Years[Current_Year]
+        User_Year = Years(Current_Year)
         User_Numbers = Only_Digits(Original_ID)
         User_Short_Year_And_Numbers = User_Year + User_Numbers
         Set_Of_User_Numbers = Create_Set_Of_ID_Numbers(User_Short_Year_And_Numbers)
@@ -143,57 +152,195 @@ def Generate_ID(Original_ID, Source="CVE"):
     else:
         return ""
 
-print("\n")
 
-Source = "CVE"
+def Test_Generation():
+    
+    print("\n")
+    
+    Source = "CVE"
 
-Original_ID = "CVE-2015-12211"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "CVE-2015-12211"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Source = "NPM"
+    Source = "NPM"
 
-Original_ID = "NPM-11"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "NPM-11"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Source = "SNYK"
+    Source = "SNYK"
 
-Original_ID = "SNYK-GOLANG-GITHUBCOMMINIOMINIOCMD-50080"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "SNYK-GOLANG-GITHUBCOMMINIOMINIOCMD-50080"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Original_ID = "SNYK-PHP-SYMFONYSYMFONY-72199"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "SNYK-PHP-SYMFONYSYMFONY-72199"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Original_ID = "SNYK-GOLANG-CODECLOUDFOUNDRYORGGOROUTERROUTE-50074"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "SNYK-GOLANG-CODECLOUDFOUNDRYORGGOROUTERROUTE-50074"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Original_ID = "SNYK-JAVA-ORGJENKINSCIPLUGINS-32426"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "SNYK-JAVA-ORGJENKINSCIPLUGINS-32426"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Original_ID = "npm:cryptiles:20180710"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "npm:cryptiles:20180710"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Original_ID = "SNYK-DOTNET-YAMLDOTNET-60255"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "SNYK-DOTNET-YAMLDOTNET-60255"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Original_ID = "SNYK-PYTHON-PYFTPDLIB-42147"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "SNYK-PYTHON-PYFTPDLIB-42147"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Original_ID = "SNYK-RUBY-DOORKEEPER-22044" 
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Original_ID = "SNYK-RUBY-DOORKEEPER-22044" 
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-Source = "User"
-Original_ID = "1001"
-id = Generate_ID(Original_ID=Original_ID, Source=Source)
-print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    Source = "User"
+    Original_ID = "1001"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
 
-print("\n")
+    print("\n") 
+
+
+################################################################################
+import peewee
+
+
+database = peewee.PostgresqlDatabase(
+    database="updater_db",
+    user="admin",
+    password="123",
+    host="localhost",
+    port="5432"
+)
+
+def dt2str(dt):
+    return dt.strftime('%Y-%m-%d %H:%M:%S')
+
+def str2dt(dts):
+    return datetime.strptime(dts, '%Y-%m-%d %H:%M:%S')
+
+class SPID(peewee.Model):
+    class Meta:
+        database = database
+        table_name = "spids"
+        ordering = ("sync", )
+    
+    id = peewee.PrimaryKeyField(null=False)
+    spid = peewee.TextField(default="")
+    sync = peewee.DateTimeField(default=datetime.utcnow)
+
+    def __str__(self):
+        return self.spid
+
+    def save(self, **kwargs):
+        with database.transaction():
+            peewee.Model.save(self, **kwargs)
+
+    @property
+    def to_json(self):
+        return dict(
+            id=self.id,
+            spid=self.spid,
+            sync=dt2str(self.sync)
+        )
+
+def Check_If_SPID_Is_Unique(ID):
+    ids = list(SPID.select().where(SPID.spid == ID))
+    return len(ids) == 0
+
+def Append_SPID_Into_Postgres_Database(SPIdentifier, Sync_Datetime=None):
+    sid = -1
+    if Check_If_SPID_Is_Unique(SPIdentifier):
+        sp = SPID.create()
+        sp.spid = SPIdentifier
+        if Sync_Datetime is None:
+            sp.sync = datetime.utcnow()
+        sp.save()
+        sid = sp.id
+    return sid
+
+def Get_Last_Sync_SPID():
+    si = [SPID.select().order_by(SPID.sync.desc()).get()]
+    if len(si) > 0:
+        return si[0].to_json
+    return None
+
+def Test_If_ID_Is_Unique():
+    if database.is_closed():
+        database.connect()
+
+    if SPID.table_exists():
+        SPID.drop_table()
+
+    if not SPID.table_exists():
+        SPID.create_table()
+
+    sid = Append_SPID_Into_Postgres_Database("SP-2018-U-011000000000")
+    sid = Append_SPID_Into_Postgres_Database("SP-2018-U-012000000000")
+    sid = Append_SPID_Into_Postgres_Database("SP-2018-U-013000000000")
+    sid = Append_SPID_Into_Postgres_Database("SP-2018-U-015000000000")
+    sid = Append_SPID_Into_Postgres_Database("SP-2018-U-014000000000")
+
+    sps = list(SPID.select())
+    for s in sps:
+        print(s.to_json)
+
+    tid = "SP-2018-U-011000000000"
+    print('Check not Unique id')
+    print(Check_If_SPID_Is_Unique(tid))
+
+    tid = "SP-2018-U-018000000000"
+    print('Check Unique id')
+    print(Check_If_SPID_Is_Unique(tid))
+
+
+    print('Last created')
+    print(Get_Last_Sync_SPID())
+
+    if not database.is_closed():
+        database.close()
+
+print('Test_If_ID_Is_Unique:')
+Test_If_ID_Is_Unique()
+print('Test complete')
+
+################################################################################
+# Methods and testing
+################################################################################
+
+### Duplicates from ws-vm-cve-search stats.py
+from sqlalchemy import create_engine, exists, Column, DateTime, Integer, String, MetaData
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+metadata = MetaData()
+engine = create_engine('sqlite:///' + os.path.join(basedir, 'stats.db'), echo=False)
+Base = declarative_base()
+
+Session = sessionmaker()
+Session.configure(bind=engine)
+session = Session()
+
+class SPID(Base):
+    pass
+
+
+Base.metadata.create_all(engine)
+
+
+def Sync_SPID_Tables():
+    pass
+
+
+def Test_Sync_IDs_Tables():
+    pass
