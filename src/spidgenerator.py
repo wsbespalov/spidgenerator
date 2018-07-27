@@ -80,136 +80,6 @@ SP_Delimeter = "-"
 SP_Max_Digits = 12
 
 
-def Generate_ID(Original_ID, Source="CVE"):
-    
-    def Only_Digits(String):
-        sis = re.sub(r"\D", "", String)
-        return sis
-
-    def Create_Set_Of_ID_Numbers(Numbers):
-        Len_Of_Numbers = len(Numbers)
-        Len_Of_Numbers_As_String = str(Len_Of_Numbers)
-        Zeros = "0"*(SP_Max_Digits - Len_Of_Numbers)
-        if Len_Of_Numbers < 10:
-            Len_Of_Numbers_As_String = "0" + Len_Of_Numbers_As_String
-        return "".join([Len_Of_Numbers_As_String, Numbers, Zeros]) 
-        
-    Current_Year = str(datetime.now().year)
-    try:
-        Src = Our_Sources[Source.lower()]
-    except Exception as ex:
-        print("Get wrong Source type: {}".format(Source))
-        return ""
-    if Src == "C":
-        OI_As_List = Original_ID.split("-")
-        if len(OI_As_List) == 3:
-            CVE_Year = Years(OI_As_List[1])
-            CVE_Numbers = OI_As_List[2]
-            CVE_Short_Year_And_Numbers = CVE_Year + CVE_Numbers
-            Set_Of_CVE_Numbers = Create_Set_Of_ID_Numbers(CVE_Short_Year_And_Numbers)
-            Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_CVE_Numbers])
-            return Our_ID
-        else:
-            return ""
-    elif Src == "N":
-        NPM_Year = Years(Current_Year)
-        NPM_Numbers = Only_Digits(Original_ID)
-        NPM_Short_Year_And_Numbers = NPM_Year + NPM_Numbers
-        Set_Of_NPM_Numbers = Create_Set_Of_ID_Numbers(NPM_Short_Year_And_Numbers)
-        Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_NPM_Numbers])
-        return Our_ID
-    elif Src == "S":
-        SNYK_Year = Years(Current_Year)
-        if Original_ID.startswith("npm:"):
-            Original_ID_Splitted = Original_ID.split(":")
-            if len(Original_ID_Splitted) > 2:
-                Original_ID_Numbers = Original_ID_Splitted[-1]
-                SNYK_Numbers = Only_Digits(Original_ID_Numbers)
-                if len(SNYK_Numbers) > 0:
-                    SNYK_Short_Year_And_Numbers = SNYK_Year + SNYK_Numbers
-                    Set_Of_SNYL_Numbers = Create_Set_Of_ID_Numbers(SNYK_Short_Year_And_Numbers)
-                    Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_SNYL_Numbers])
-                    return Our_ID
-                return ""
-        else:
-            Original_ID_Splitted = Original_ID.split("-")
-            if len(Original_ID_Splitted) > 1:
-                Original_ID_Numbers = Original_ID_Splitted[-1]
-                SNYK_Numbers = Only_Digits(Original_ID_Numbers)
-                if len(SNYK_Numbers) > 0:
-                    SNYK_Short_Year_And_Numbers = SNYK_Year + SNYK_Numbers
-                    Set_Of_SNYL_Numbers = Create_Set_Of_ID_Numbers(SNYK_Short_Year_And_Numbers)
-                    Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_SNYL_Numbers])
-                    return Our_ID
-                return ""
-    elif Src == "U":
-        User_Year = Years(Current_Year)
-        User_Numbers = Only_Digits(Original_ID)
-        User_Short_Year_And_Numbers = User_Year + User_Numbers
-        Set_Of_User_Numbers = Create_Set_Of_ID_Numbers(User_Short_Year_And_Numbers)
-        Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_User_Numbers])
-        return Our_ID
-    else:
-        return ""
-
-
-def Test_Generation():
-    
-    print("\n")
-    
-    Source = "CVE"
-
-    Original_ID = "CVE-2015-12211"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Source = "NPM"
-
-    Original_ID = "NPM-11"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Source = "SNYK"
-
-    Original_ID = "SNYK-GOLANG-GITHUBCOMMINIOMINIOCMD-50080"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Original_ID = "SNYK-PHP-SYMFONYSYMFONY-72199"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Original_ID = "SNYK-GOLANG-CODECLOUDFOUNDRYORGGOROUTERROUTE-50074"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Original_ID = "SNYK-JAVA-ORGJENKINSCIPLUGINS-32426"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Original_ID = "npm:cryptiles:20180710"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Original_ID = "SNYK-DOTNET-YAMLDOTNET-60255"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Original_ID = "SNYK-PYTHON-PYFTPDLIB-42147"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Original_ID = "SNYK-RUBY-DOORKEEPER-22044" 
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    Source = "User"
-    Original_ID = "1001"
-    id = Generate_ID(Original_ID=Original_ID, Source=Source)
-    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
-
-    print("\n") 
-
 
 ################################################################################
 import peewee
@@ -271,10 +141,12 @@ def Append_SPID_Into_Postgres_Database(SPIdentifier, Sync_Datetime=None):
     return sid
 
 def Get_Last_Sync_SPID():
-    si = [SPID.select().order_by(SPID.sync.desc()).get()]
-    if len(si) > 0:
-        return si[0].to_json
-    return None
+    if SPID.table_exists():
+        if SPID.select().count() > 0:
+            si = [SPID.select().order_by(SPID.sync.desc()).get()]
+            if len(si) > 0:
+                return si[0].to_json
+    return dict(id=0, spid="", sync=datetime.utcnow())
 
 def Test_If_ID_Is_Unique():
     if database.is_closed():
@@ -433,4 +305,159 @@ def Sync_SPID_Tables():
 def Test_Sync_IDs_Tables():
     Sync_SPID_Tables()
 
-Test_Sync_IDs_Tables()
+# Test_Sync_IDs_Tables()
+
+
+def Generate_ID(Original_ID, Source="CVE"):
+    def Only_Digits(String):
+        sis = re.sub(r"\D", "", String)
+        return sis
+
+    def Create_Set_Of_ID_Numbers(Numbers):
+        Len_Of_Numbers = len(Numbers)
+        Len_Of_Numbers_As_String = str(Len_Of_Numbers)
+        Zeros = "0" * (SP_Max_Digits - Len_Of_Numbers)
+        if Len_Of_Numbers < 10:
+            Len_Of_Numbers_As_String = "0" + Len_Of_Numbers_As_String
+        return "".join([Len_Of_Numbers_As_String, Numbers, Zeros])
+
+    Current_Year = str(datetime.now().year)
+    try:
+        Src = Our_Sources[Source.lower()]
+    except Exception as ex:
+        print("Get wrong Source type: {}".format(Source))
+        return ""
+    if Src == "C":
+        OI_As_List = Original_ID.split("-")
+        if len(OI_As_List) == 3:
+            CVE_Year = Years(OI_As_List[1])
+            CVE_Numbers = OI_As_List[2]
+            CVE_Short_Year_And_Numbers = CVE_Year + CVE_Numbers
+            Set_Of_CVE_Numbers = Create_Set_Of_ID_Numbers(CVE_Short_Year_And_Numbers)
+            Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_CVE_Numbers])
+            return Our_ID
+        else:
+            return ""
+    elif Src == "N":
+        NPM_Year = Years(Current_Year)
+        NPM_Numbers = Only_Digits(Original_ID)
+        NPM_Short_Year_And_Numbers = NPM_Year + NPM_Numbers
+        Set_Of_NPM_Numbers = Create_Set_Of_ID_Numbers(NPM_Short_Year_And_Numbers)
+        Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_NPM_Numbers])
+        return Our_ID
+    elif Src == "S":
+        SNYK_Year = Years(Current_Year)
+        if Original_ID.startswith("npm:"):
+            Original_ID_Splitted = Original_ID.split(":")
+            if len(Original_ID_Splitted) > 2:
+                Original_ID_Numbers = Original_ID_Splitted[-1]
+                SNYK_Numbers = Only_Digits(Original_ID_Numbers)
+                if len(SNYK_Numbers) > 0:
+                    SNYK_Short_Year_And_Numbers = SNYK_Year + SNYK_Numbers
+                    Set_Of_SNYL_Numbers = Create_Set_Of_ID_Numbers(SNYK_Short_Year_And_Numbers)
+                    Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_SNYL_Numbers])
+                    return Our_ID
+                return ""
+        else:
+            Original_ID_Splitted = Original_ID.split("-")
+            if len(Original_ID_Splitted) > 1:
+                Original_ID_Numbers = Original_ID_Splitted[-1]
+                SNYK_Numbers = Only_Digits(Original_ID_Numbers)
+                if len(SNYK_Numbers) > 0:
+                    SNYK_Short_Year_And_Numbers = SNYK_Year + SNYK_Numbers
+                    Set_Of_SNYL_Numbers = Create_Set_Of_ID_Numbers(SNYK_Short_Year_And_Numbers)
+                    Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_SNYL_Numbers])
+                    return Our_ID
+                return ""
+    elif Src == "U":
+        User_Year = Years(Current_Year)
+        Last_SPID_Element = Get_Last_Sync_SPID()
+        Not_Uniq = True
+        Last_ID = Last_SPID_Element["id"]
+        while Not_Uniq:
+            Last_ID = Last_ID + 1
+            ids = SPID.get_or_none(SPID.id == Last_ID)
+            if ids is None:
+                Not_Uniq = False
+        User_Numbers = str(Last_ID)
+        User_Short_Year_And_Numbers = User_Year + User_Numbers
+        Set_Of_User_Numbers = Create_Set_Of_ID_Numbers(User_Short_Year_And_Numbers)
+        Our_ID = SP_Delimeter.join([SP_Prefix, Current_Year, Src, Set_Of_User_Numbers])
+        return Our_ID
+    else:
+        return ""
+
+
+# TODO: What about storing SPIDs in Postgres
+
+def Test_Generation():
+    print("\n")
+
+    # Source = "CVE"
+    #
+    # Original_ID = "CVE-2015-12211"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Source = "NPM"
+    #
+    # Original_ID = "NPM-11"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Source = "SNYK"
+    #
+    # Original_ID = "SNYK-GOLANG-GITHUBCOMMINIOMINIOCMD-50080"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Original_ID = "SNYK-PHP-SYMFONYSYMFONY-72199"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Original_ID = "SNYK-GOLANG-CODECLOUDFOUNDRYORGGOROUTERROUTE-50074"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Original_ID = "SNYK-JAVA-ORGJENKINSCIPLUGINS-32426"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Original_ID = "npm:cryptiles:20180710"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Original_ID = "SNYK-DOTNET-YAMLDOTNET-60255"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Original_ID = "SNYK-PYTHON-PYFTPDLIB-42147"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+    #
+    # Original_ID = "SNYK-RUBY-DOORKEEPER-22044"
+    # id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    # print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+
+    Source = "User"
+    Original_ID = "1001"
+    id = Generate_ID(Original_ID=Original_ID, Source=Source)
+    print("ID For Source {} With Original ID = {} will be {}".format(Source, Original_ID, id))
+
+    print("\n")
+
+if database.is_closed:
+    database.connect()
+
+if SPID.table_exists():
+    SPID.drop_table()
+
+if not SPID.table_exists():
+    SPID.create_table()
+
+sid = Append_SPID_Into_Postgres_Database("SP-2018-U-011000000000")
+sid = Append_SPID_Into_Postgres_Database("SP-2018-U-012000000000")
+
+Test_Generation()
+
+database.close()
